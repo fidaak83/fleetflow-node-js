@@ -36,6 +36,9 @@ app.post('/pdf', async (req, res) => {
         });
 
         const page = await browser.newPage();
+
+        const url = "https://example.com";
+        await page.goto(url, { waitUntil: 'load', timeout: 60000 });
         // await page.goto(url, { waitUntil: 'networkidle0' });
         await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 }); // 60 sec
 
