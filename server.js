@@ -57,9 +57,7 @@ app.post('/pdf', async (req, res) => {
             }
         });
 
-        const base64 = buffer.toString('base64');
-
-        res.json({ base64 });
+        res.json({ base64: Buffer.from(buffer).toString('base64') });
 
     } catch (error) {
         console.error('Error generating PDF:', error);
