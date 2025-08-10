@@ -36,7 +36,8 @@ app.post('/pdf', async (req, res) => {
         });
 
         const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle0' });
+        // await page.goto(url, { waitUntil: 'networkidle0' });
+        await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 }); // 60 sec
 
         const buffer = await page.pdf({
             format: 'A4',
