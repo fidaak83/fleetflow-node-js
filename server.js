@@ -19,8 +19,6 @@ app.get('/checkport', (req, res) => {
     res.send(`PDF Generator for FleetFlow ✅ Server running on port ${PORT}`);
 });
 
-
-
 // POST route for PDF generation
 app.post('/pdf', async (req, res) => {
     const { url } = req.body;
@@ -32,15 +30,20 @@ app.post('/pdf', async (req, res) => {
     let browser;
     try {
         browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--single-process',
+                '--no-zygote'
+            ],
         });
 
         const page = await browser.newPage();
 
-        const url = "https://example.com";
-        await page.goto(url, { waitUntil: 'load', timeout: 60000 });
-        // await page.goto(url, { waitUntil: 'networkidle0' });
-        await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 }); // 60 sec
+        // Disable navigation timeout by setting timeout: 0
+        await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
 
         const buffer = await page.pdf({
             format: 'A4',
@@ -54,12 +57,12 @@ app.post('/pdf', async (req, res) => {
             }
         });
 
-        const base64 = Buffer.from(buffer).toString('base64');
+        const base64 = buffer.toString('base64');
 
         res.json({ base64 });
 
     } catch (error) {
-        console.error(error);
+        console.error('Error generating PDF:', error);
         res.status(500).json({ error: 'PDF generation failed', message: error.message });
     } finally {
         if (browser) await browser.close();
@@ -86,5 +89,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${PORT}`);
 });
-
-// UT2@w#uo2kldsHo4
